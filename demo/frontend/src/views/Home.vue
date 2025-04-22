@@ -178,21 +178,45 @@ async function processImage() {
     const formData = new FormData();
     formData.append('file', selectedFile.value);
     
+    console.log('Processing image:', selectedFile.value.name, 'Size:', selectedFile.value.size);
+    
     // Upload the file
     const uploadResponse = await api.uploadImage(formData);
     
+    console.log('Upload response:', uploadResponse.data);
+    
     if (uploadResponse.data.success) {
       // Create a job ID for the new process
-      const jobResponse = await api.createJob({
-        filepath: uploadResponse.data.filepath
-      });
+      const filepath = uploadResponse.data.filepath;
+      console.log('Creating job with filepath:', filepath);
       
-      // Navigate to results page immediately after getting job ID
-      router.push(`/results/${jobResponse.data.job_id}`);
+      try {
+        const jobResponse = await api.createJob({
+          filepath: filepath
+        });
+        
+        console.log('Job response:', jobResponse.data);
+        
+        // Navigate to results page immediately after getting job ID
+        router.push(`/results/${jobResponse.data.job_id}`);
+      } catch (jobError) {
+        console.error('Error creating job:', jobError);
+        if (jobError.response && jobError.response.data) {
+          toast.error(`Error: ${jobError.response.data.error || 'Failed to create processing job'}`);
+        } else {
+          toast.error('Failed to create processing job. Please try again.');
+        }
+      }
+    } else {
+      toast.error(uploadResponse.data.error || 'Upload failed');
     }
   } catch (error) {
     console.error('Error processing image:', error);
-    toast.error('Failed to process image. Please try again.');
+    if (error.response && error.response.data) {
+      toast.error(`Error: ${error.response.data.error || 'Failed to process image'}`);
+    } else {
+      toast.error('Failed to process image. Please try again.');
+    }
   } finally {
     isUploading.value = false;
   }

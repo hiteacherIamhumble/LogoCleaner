@@ -213,7 +213,7 @@ def remove_logo(image, mask, threshold=0.5):
     """
     
     # === Step 0: Setup ===
-    client = openai.OpenAI(api_key="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",
+    client = openai.OpenAI(api_key="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",
                           max_retries=3,  # Add retries for robustness
                           timeout=300.0)  # 5 minute timeout
     openai_image_size = (512, 512)  # or (1024, 1024) if needed

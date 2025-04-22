@@ -64,60 +64,85 @@ def image_to_base64(image):
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
+def resolve_file_path(filepath):
+    """Try to resolve a file path, checking different possible locations."""
+    # First check if the path exists as is
+    if os.path.exists(filepath):
+        return filepath
+        
+    # If it's not an absolute path, try to find it in the uploads folder
+    filename = os.path.basename(filepath)
+    upload_path = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(upload_path):
+        logger.info(f"Found file in uploads folder: {upload_path}")
+        return upload_path
+    
+    # Try just the filename in the current directory
+    cwd_path = os.path.join(os.getcwd(), filename)
+    if os.path.exists(cwd_path):
+        logger.info(f"Found file in current directory: {cwd_path}")
+        return cwd_path
+    
+    # If we can't find it, log debug info and return None
+    logger.warning(f"Could not resolve file path: {filepath}")
+    logger.warning(f"Current directory: {os.getcwd()}")
+    logger.warning(f"Files in uploads directory: {os.listdir(UPLOAD_FOLDER)}")
+    return None
+
 # Fallback function for when ML backend is not available
 def dummy_process_image(image_path, output_dir):
     """Simple function to process images without ML models"""
-    try:
-        # Open the original image
-        original_image = Image.open(image_path).convert("RGB")
+    # try:
+    #     # Open the original image
+    #     original_image = Image.open(image_path).convert("RGB")
         
-        # Save the original image
-        original_image.save(os.path.join(output_dir, "original.png"))
+    #     # Save the original image
+    #     original_image.save(os.path.join(output_dir, "original.png"))
         
-        # Create a copy with a green "bounding box" for demonstration
-        bbox_image = original_image.copy()
-        width, height = bbox_image.size
-        # Draw a simple green rectangle in the center (30% of the image)
-        bbox = (
-            int(width * 0.35), 
-            int(height * 0.35), 
-            int(width * 0.65), 
-            int(height * 0.65)
-        )
+    #     # Create a copy with a green "bounding box" for demonstration
+    #     bbox_image = original_image.copy()
+    #     width, height = bbox_image.size
+    #     # Draw a simple green rectangle in the center (30% of the image)
+    #     bbox = (
+    #         int(width * 0.35), 
+    #         int(height * 0.35), 
+    #         int(width * 0.65), 
+    #         int(height * 0.65)
+    #     )
         
-        # Draw rectangle on the image
-        from PIL import ImageDraw
-        draw = ImageDraw.Draw(bbox_image)
-        draw.rectangle(bbox, outline="green", width=3)
-        bbox_image.save(os.path.join(output_dir, "original_with_bbox.png"))
+    #     # Draw rectangle on the image
+    #     from PIL import ImageDraw
+    #     draw = ImageDraw.Draw(bbox_image)
+    #     draw.rectangle(bbox, outline="green", width=3)
+    #     bbox_image.save(os.path.join(output_dir, "original_with_bbox.png"))
         
-        # Create a "mask" overlay (red tint in the center)
-        mask_overlay = original_image.copy()
-        mask = Image.new('L', original_image.size, 0)
-        mask_draw = ImageDraw.Draw(mask)
-        mask_draw.rectangle(bbox, fill=128)
+    #     # Create a "mask" overlay (red tint in the center)
+    #     mask_overlay = original_image.copy()
+    #     mask = Image.new('L', original_image.size, 0)
+    #     mask_draw = ImageDraw.Draw(mask)
+    #     mask_draw.rectangle(bbox, fill=128)
         
-        # Apply red tint to the masked area
-        mask_array = np.array(mask_overlay)
-        mask_array[(np.array(mask) > 64)] = mask_array[(np.array(mask) > 64)] * 0.7 + np.array([255, 0, 0]) * 0.3
-        mask_overlay = Image.fromarray(mask_array.astype(np.uint8))
-        mask_overlay.save(os.path.join(output_dir, "refined_mask_overlay.png"))
+    #     # Apply red tint to the masked area
+    #     mask_array = np.array(mask_overlay)
+    #     mask_array[(np.array(mask) > 64)] = mask_array[(np.array(mask) > 64)] * 0.7 + np.array([255, 0, 0]) * 0.3
+    #     mask_overlay = Image.fromarray(mask_array.astype(np.uint8))
+    #     mask_overlay.save(os.path.join(output_dir, "refined_mask_overlay.png"))
         
-        # Create a "logo removed" version (just blur the center area)
-        removed = original_image.copy()
-        mask_blur = original_image.crop(bbox).resize(
-            (bbox[2] - bbox[0], bbox[3] - bbox[1]), 
-            Image.LANCZOS
-        ).filter(Image.BoxBlur(10))
+    #     # Create a "logo removed" version (just blur the center area)
+    #     removed = original_image.copy()
+    #     mask_blur = original_image.crop(bbox).resize(
+    #         (bbox[2] - bbox[0], bbox[3] - bbox[1]), 
+    #         Image.LANCZOS
+    #     ).filter(Image.BoxBlur(10))
         
-        removed.paste(mask_blur, bbox)
-        removed.save(os.path.join(output_dir, "logo_removed.png"))
+    #     removed.paste(mask_blur, bbox)
+    #     removed.save(os.path.join(output_dir, "logo_removed.png"))
         
-        return True
-    except Exception as e:
-        logger.error(f"Error in dummy processing: {e}")
-        logger.error(traceback.format_exc())
-        return False
+    #     return True
+    # except Exception as e:
+    #     logger.error(f"Error in dummy processing: {e}")
+    #     logger.error(traceback.format_exc())
+    #     return False
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -130,6 +155,8 @@ def upload_file():
     if 'file' not in request.files:
         logger.warning("No file part in request")
         return jsonify({'error': 'No file part'}), 400
+        
+    logger.info(f"Request files: {request.files}")
     
     file = request.files['file']
     
@@ -144,6 +171,11 @@ def upload_file():
         file.save(file_path)
         
         logger.info(f"File saved at {file_path}")
+        
+        # Validate file exists after saving
+        if not os.path.exists(file_path):
+            logger.error(f"File not found after saving: {file_path}")
+            return jsonify({'error': 'File not found after saving'}), 500
         
         # Return the file path for the next steps
         return jsonify({
@@ -163,9 +195,19 @@ def create_job():
     
     filepath = data.get('filepath')
     
-    if not filepath or not os.path.exists(filepath):
-        logger.warning(f"Invalid file path: {filepath}")
-        return jsonify({'error': 'Invalid file path'}), 400
+    # More detailed logging for filepath issues
+    if not filepath:
+        logger.warning("No filepath provided in request")
+        return jsonify({'error': 'No filepath provided'}), 400
+    
+    # Resolve the file path
+    resolved_path = resolve_file_path(filepath)
+    if not resolved_path:
+        return jsonify({'error': 'File not found at the specified path'}), 400
+    
+    # Update the filepath with the resolved path
+    filepath = resolved_path
+    logger.info(f"Resolved file path: {filepath}")
     
     try:
         # Create a unique ID for this processing job
@@ -225,9 +267,19 @@ def start_process_image():
     
     filepath = data.get('filepath')
     
-    if not filepath or not os.path.exists(filepath):
-        logger.warning(f"Invalid file path: {filepath}")
-        return jsonify({'error': 'Invalid file path'}), 400
+    # More detailed logging for filepath issues
+    if not filepath:
+        logger.warning("No filepath provided in request")
+        return jsonify({'error': 'No filepath provided'}), 400
+    
+    # Resolve the file path
+    resolved_path = resolve_file_path(filepath)
+    if not resolved_path:
+        return jsonify({'error': 'File not found at the specified path'}), 400
+    
+    # Update the filepath with the resolved path
+    filepath = resolved_path
+    logger.info(f"Resolved file path: {filepath}")
     
     try:
         # Create a unique ID for this processing job
@@ -363,9 +415,18 @@ def generate_final_image(job_id):
         filepath = job_info.get('filepath')
         processing_stage = job_info.get('processing_stage')
         
-        if not filepath or not os.path.exists(filepath):
-            logger.warning(f"Invalid file path: {filepath}")
-            return jsonify({'error': 'Original file path not found'}), 400
+        if not filepath:
+            logger.warning("No filepath provided in job info")
+            return jsonify({'error': 'No filepath in job info'}), 400
+        
+        # Resolve the file path
+        resolved_path = resolve_file_path(filepath)
+        if not resolved_path:
+            return jsonify({'error': 'Original file not found at the specified path'}), 400
+        
+        # Update the filepath with the resolved path
+        filepath = resolved_path
+        logger.info(f"Resolved file path: {filepath}")
         
         # Check if already fully processed
         if processing_stage == 'completed':

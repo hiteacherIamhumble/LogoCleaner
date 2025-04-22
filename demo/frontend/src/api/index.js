@@ -24,10 +24,14 @@ const longOperationClient = axios.create({
 export default {
   // Image Upload
   uploadImage(formData) {
+    console.log('Uploading image:', formData.get('file').name);
     return apiClient.post('/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
+    }).catch(error => {
+      console.error('Upload error:', error.response ? error.response.data : error.message);
+      throw error;
     });
   },
   
