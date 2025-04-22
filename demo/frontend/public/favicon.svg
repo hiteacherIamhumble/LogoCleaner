@@ -1,0 +1,7 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="#6366f1"/>
+  
+  <!-- LC Letters -->
+  <text x="32" y="38" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">LC</text>
+</svg>

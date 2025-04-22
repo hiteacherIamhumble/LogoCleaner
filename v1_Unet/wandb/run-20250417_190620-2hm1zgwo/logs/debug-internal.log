@@ -1,0 +1,16 @@
+{"time":"2025-04-17T19:06:21.791872608+08:00","level":"INFO","msg":"stream: starting","core version":"0.19.9","symlink path":"/home/yuhang/LogoCleaner/v1_Unet/wandb/run-20250417_190620-2hm1zgwo/logs/debug-core.log"}
+{"time":"2025-04-17T19:06:22.100511955+08:00","level":"INFO","msg":"created new stream","id":"2hm1zgwo"}
+{"time":"2025-04-17T19:06:22.100557506+08:00","level":"INFO","msg":"stream: started","id":"2hm1zgwo"}
+{"time":"2025-04-17T19:06:22.100610108+08:00","level":"INFO","msg":"writer: Do: started","stream_id":"2hm1zgwo"}
+{"time":"2025-04-17T19:06:22.100652569+08:00","level":"INFO","msg":"handler: started","stream_id":"2hm1zgwo"}
+{"time":"2025-04-17T19:06:22.100645579+08:00","level":"INFO","msg":"sender: started","stream_id":"2hm1zgwo"}
+{"time":"2025-04-17T19:06:22.423854612+08:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-17T19:44:44.87753735+08:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-17T19:44:44.886066017+08:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-17T19:44:45.881625863+08:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading media/images/predictions_epoch_29_688_899f2d20403b3d6f801b.png","runtime_seconds":1.671945757,"progress":"899.7KB/899.7KB"},{"desc":"uploading output.log","runtime_seconds":0.530714164},{"desc":"uploading wandb-summary.json","runtime_seconds":0.530701674,"progress":"185.7KB/185.7KB"}],"total_operations":3}}
+{"time":"2025-04-17T19:44:46.300006146+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-17T19:44:46.828589666+08:00","level":"INFO","msg":"stream: closing","id":"2hm1zgwo"}
+{"time":"2025-04-17T19:44:46.828631276+08:00","level":"INFO","msg":"handler: closed","stream_id":"2hm1zgwo"}
+{"time":"2025-04-17T19:44:46.828648867+08:00","level":"INFO","msg":"writer: Close: closed","stream_id":"2hm1zgwo"}
+{"time":"2025-04-17T19:44:46.828685297+08:00","level":"INFO","msg":"sender: closed","stream_id":"2hm1zgwo"}
+{"time":"2025-04-17T19:44:46.828781517+08:00","level":"INFO","msg":"stream: closed","id":"2hm1zgwo"}
