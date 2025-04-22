@@ -68,8 +68,11 @@ v1_Unet/
    ```bash
    jupyter notebook
    ```
+3. Download the Unet model from the huggingface
+   - Model link: [LogoCleaner Model on HuggingFace](https://huggingface.co/PeterDAI/LogoCleaner/tree/main)
+  - Place the downloaded model in the result directory.
 
-3. Open `pipeline.ipynb` and run the cells to:
+4. Open `pipeline.ipynb` and run the cells to:
    - Configure dataset paths and hyperparameters
    - Load and preprocess data
    - Train the U-Net model
