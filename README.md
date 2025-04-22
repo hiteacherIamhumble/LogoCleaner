@@ -1,8 +1,15 @@
-# LogoCleaner - AI-Powered Logo Detection and Removal
+<table border="0">
+  <tr>
+    <td><img src="./assets/Logo.png" alt="LogoCleaner" width="150"/></td>
+    <td>
+      <img alt="LogoCleaner" src="https://img.shields.io/badge/LogoCleaner-AI--Powered_Logo_Removal-blue">
+      <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
+      <img alt="Python 3.8+" src="https://img.shields.io/badge/python-3.8+-blue.svg">
+    </td>
+  </tr>
+</table>
 
-<img alt="LogoCleaner" src="https://img.shields.io/badge/LogoCleaner-AI--Powered_Logo_Removal-blue">
-<img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
-<img alt="Python 3.8+" src="https://img.shields.io/badge/python-3.8+-blue.svg">
+# LogoCleaner - AI-Powered Logo Detection and Removal
 
 **PolyU 2025 Spring COMP4432 Team 24 Course Project**
 
